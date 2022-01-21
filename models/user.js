@@ -1,29 +1,35 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 
-const User = mongoose.model("User", {
-  name: {
-    type: String,
-    required: true,
-    trim: true,
-  },
+const User = mongoose.model(
+  "User",
 
-  email: {
-    type: String,
-    required: true,
-    trim: true,
-    unique: true,
-  },
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
 
-  cash: {
-    type: Number,
-    default: 0,
-  },
+    email: {
+      type: String,
+      required: true,
+      trim: true,
+      unique: true,
+    },
 
-  credit: {
-    type: Number,
-    default: 0,
-  },
-});
+    cash: {
+      type: Number,
+      default: 0,
+    },
+
+    credit: {
+      type: Number,
+      default: 0,
+    },
+
+    //   "Bank-API.Users"
+  }
+);
 
 module.exports = User;

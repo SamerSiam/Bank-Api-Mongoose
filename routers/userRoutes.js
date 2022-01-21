@@ -4,8 +4,10 @@ const router = new express.Router();
 
 /**********************get all users******************* */
 router.get("/users", async (req, res) => {
+  console.log("inside get");
   try {
     const user = await User.find({});
+    console.log(user);
     if (!user) {
       return res.status(404).send();
     }
@@ -14,3 +16,5 @@ router.get("/users", async (req, res) => {
     res.status(500).send(err);
   }
 });
+
+module.exports = router;
