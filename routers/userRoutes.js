@@ -1,20 +1,38 @@
 const express = require("express");
-const User = require("../models/user");
+const {
+  getAllUsers,
+  deleteUser,
+  getUserbyID,
+  addNewUser,
+  depositCash,
+  increaseCredit,
+  withdrawCash,
+  withdrawCredit,
+} = require("../controllers/apiControllers");
+
 const router = new express.Router();
 
-/**********************get all users******************* */
-router.get("/users", async (req, res) => {
-  console.log("inside get");
-  try {
-    const user = await User.find({});
-    console.log(user);
-    if (!user) {
-      return res.status(404).send();
-    }
-    res.send(user);
-  } catch (err) {
-    res.status(500).send(err);
-  }
-});
+/**********************get  users******************* */
+router.get("/users", getAllUsers);
+router.get("/users/:id", getUserbyID);
+
+/**********************add new user************************ */
+router.post("/users", addNewUser);
+
+/**********************delete user by id************************ */
+router.delete("/users/:id", deleteUser);
+
+/*******************************Deposit cash & credit******** */
+
+router.patch("/accounts/deposit/cash", depositCash);
+router.patch("/accounts/deposit/credit", increaseCredit);
+
+/*******************************Withdraw cash & credit******** */
+router.patch("/accounts/withdraw/cash", withdrawCash);
+router.patch("/accounts/withdraw/credit", withdrawCredit);
+
+/*******************************Transfer cash & credit******** */
+// router.patch("/accounts/transfer/cash", transferCash);
+// router.patch("/accounts/transfer/credit", transferCredit);
 
 module.exports = router;
