@@ -38,7 +38,7 @@ const addNewUser = async (req, res) => {
   }
 };
 
-/**********************add new user************************ */
+/**********************delete user************************ */
 const deleteUser = async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);
@@ -53,11 +53,11 @@ const deleteUser = async (req, res) => {
 
 /*******************************Deposit cash ******** */
 const depositCash = async (req, res) => {
-  const { _id, cash } = req.body;
+  const { id, cash } = req.body;
 
   const update = { $inc: { cash: cash } };
   try {
-    const user = await User.findByIdAndUpdate(_id, update, {
+    const user = await User.findByIdAndUpdate(id, update, {
       new: true,
       runValidators: true,
     });
@@ -72,12 +72,12 @@ const depositCash = async (req, res) => {
 };
 /*******************************Increase Credit ******** */
 const increaseCredit = async (req, res) => {
-  const { _id, credit } = req.body;
+  const { id, credit } = req.body;
 
   const update = { $inc: { credit: credit } };
 
   try {
-    const user = await User.findByIdAndUpdate(_id, update, {
+    const user = await User.findByIdAndUpdate(id, update, {
       new: true,
       runValidators: true,
     });
@@ -92,12 +92,12 @@ const increaseCredit = async (req, res) => {
 };
 /*******************************Withdraw cash ******** */
 const withdrawCash = async (req, res) => {
-  const { _id, cash } = req.body;
+  const { id, cash } = req.body;
 
   const update = { $inc: { cash: -1 * cash } };
 
   try {
-    const getUser = await User.findById(_id);
+    const getUser = await User.findById(id);
     console.log(getUser);
     if (getUser.cash - cash < 0) {
       return res.status(400).send("Not enough funds in your account!");
@@ -118,16 +118,16 @@ const withdrawCash = async (req, res) => {
 
 /*******************************Withdraw  credit******** */
 const withdrawCredit = async (req, res) => {
-  const { _id, credit } = req.body;
+  const { id, credit } = req.body;
 
   const update = { $inc: { credit: -1 * credit } };
 
   try {
-    const getUser = await User.findById(_id);
+    const getUser = await User.findById(id);
     if (getUser.credit - credit < 0) {
       return res.status(400).send("Not enough funds in your account!");
     }
-    const user = await User.findByIdAndUpdate(_id, update, {
+    const user = await User.findByIdAndUpdate(id, update, {
       new: true,
       runValidators: true,
     });
@@ -142,6 +142,11 @@ const withdrawCredit = async (req, res) => {
 };
 
 // /*******************************Transfer cash & credit******** */
+
+const transferCash = async (req, res) => {
+  const { from_id, cash, credit } = req.body;
+};
+
 // router.patch("/accounts/transfer/:type", async (req, res) => {
 //   const { _id, cash, credit } = req.body;
 //   //   if (!cash) {
