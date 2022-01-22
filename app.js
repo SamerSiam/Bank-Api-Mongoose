@@ -16,22 +16,7 @@ app.use("/api", userRouter);
 const publicPath = path.join(__dirname, "client/build");
 
 app.use(express.static(publicPath));
-//
 
-// app.get("/api/users", (req, res) => {
-//   try {
-//     res.status(200).send({ userName: "Bob" });
-//   } catch (e) {
-//     res.status(400).send({ error: e.message });
-//   }
-// });
-
-/** from Mordi
-app.get("*", (req, res) => {
-  res.sendFile(path.resolve(publicPath, "index.html"));
-});
-//
-*/
 app.listen(port, () => {
   console.log("listening on port " + port);
 });

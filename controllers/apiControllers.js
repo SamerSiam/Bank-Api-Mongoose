@@ -56,6 +56,9 @@ const depositCash = async (req, res) => {
   const { id, cash } = req.body;
 
   const update = { $inc: { cash: cash } };
+  if (cash <= 0) {
+    return res.status(400).send(`Deposit Amount {${cash}} must be greater than 0!`);
+  }
   try {
     const user = await User.findByIdAndUpdate(id, update, {
       new: true,
@@ -75,7 +78,9 @@ const increaseCredit = async (req, res) => {
   const { id, credit } = req.body;
 
   const update = { $inc: { credit: credit } };
-
+  if (credit <= 0) {
+    return res.status(400).send(`Credit Amount {${credit}} must be greater than 0!`);
+  }
   try {
     const user = await User.findByIdAndUpdate(id, update, {
       new: true,
@@ -95,14 +100,16 @@ const withdrawCash = async (req, res) => {
   const { id, cash } = req.body;
 
   const update = { $inc: { cash: -1 * cash } };
-
+  if (cash <= 0) {
+    return res.status(400).send(`Withdraw Amount {${cash}} must be greater than 0!`);
+  }
   try {
     const getUser = await User.findById(id);
     console.log(getUser);
     if (getUser.cash - cash < 0) {
       return res.status(400).send("Not enough funds in your account!");
     }
-    const user = await User.findByIdAndUpdate(_id, update, {
+    const user = await User.findByIdAndUpdate(id, update, {
       new: true,
       runValidators: true,
     });
@@ -121,7 +128,9 @@ const withdrawCredit = async (req, res) => {
   const { id, credit } = req.body;
 
   const update = { $inc: { credit: -1 * credit } };
-
+  if (credit <= 0) {
+    return res.status(400).send(`Withdraw Amount {${credit}} must be greater than 0!`);
+  }
   try {
     const getUser = await User.findById(id);
     if (getUser.credit - credit < 0) {
@@ -141,42 +150,81 @@ const withdrawCredit = async (req, res) => {
   }
 };
 
-// /*******************************Transfer cash & credit******** */
+// /*******************************Transfer cash******** */
 
 const transferCash = async (req, res) => {
-  const { from_id, cash, credit } = req.body;
+  const { fromId, toId, cash } = req.body;
+  const updateUsr1 = { $inc: { cash: -1 * cash } };
+  const updateUsr2 = { $inc: { cash: cash } };
+  if (cash <= 0) {
+    return res.status(400).send(`Transfer Amount {${cash}} must be greater than 0!`);
+  }
+  try {
+    const fromUser = await User.findById(fromId);
+    const toUser = await User.findById(toId);
+
+    if (!fromUser || !toUser) {
+      return res.status(404).send("One or more users do not exist!");
+    }
+    if (fromUser.cash - cash < 0) {
+      return res.status(400).send("Not enough funds in your account to perform transfer!");
+    }
+
+    const user1 = await User.findByIdAndUpdate(fromId, updateUsr1, {
+      new: true,
+      runValidators: true,
+    });
+    const user2 = await User.findByIdAndUpdate(toId, updateUsr2, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!user1 || !user2) {
+      return res.status(404).send("One or more users do not exist!");
+    }
+    res.send(user1 + user2);
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
 };
+// /*******************************Transfer credit******** */
 
-// router.patch("/accounts/transfer/:type", async (req, res) => {
-//   const { _id, cash, credit } = req.body;
-//   //   if (!cash) {
-//   //     cash = 0;
-//   //   }
-//   //   if (!credit) {
-//   //     credit = 0;
-//   //   }
+const transferCredit = async (req, res) => {
+  const { fromId, toId, credit } = req.body;
+  const updateUsr1 = { $inc: { credit: -1 * credit } };
+  const updateUsr2 = { $inc: { credit: credit } };
+  if (credit <= 0) {
+    return res.status(400).send(`Transfer Amount {${credit}} must be greater than 0!`);
+  }
+  try {
+    const fromUser = await User.findById(fromId);
+    const toUser = await User.findById(toId);
 
-//   console.log("withdraws", _id, cash, credit);
+    if (!fromUser || !toUser) {
+      return res.status(404).send("One or more users do not exist!");
+    }
+    if (fromUser.credit - credit < 0) {
+      return res.status(400).send("Not enough funds in your account to perform transfer!");
+    }
 
-//   try {
-//     const user = await User.findByIdAndUpdate(
-//       _id,
-//       { $inc: { cash: -1 * cash, credit: -1 * credit } },
-//       {
-//         new: true,
-//         runValidators: true,
-//       }
-//     );
+    const user1 = await User.findByIdAndUpdate(fromId, updateUsr1, {
+      new: true,
+      runValidators: true,
+    });
+    const user2 = await User.findByIdAndUpdate(toId, updateUsr2, {
+      new: true,
+      runValidators: true,
+    });
 
-//     if (!user) {
-//       return res.status(404).send();
-//     }
-//     res.send(user);
-//   } catch (err) {
-//     res.status(400).send(err);
-//   }
-// });
-
+    if (!user1 || !user2) {
+      return res.status(404).send("One or more users do not exist!");
+    }
+    res.send(user1 + user2);
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+};
+/***************************Module Exports */
 module.exports = {
   getAllUsers,
   deleteUser,
@@ -186,4 +234,6 @@ module.exports = {
   increaseCredit,
   withdrawCash,
   withdrawCredit,
+  transferCash,
+  transferCredit,
 };
