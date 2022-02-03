@@ -21,7 +21,7 @@ const {
 const router = new express.Router();
 
 /**********************get  users******************* */
-router.get("/users", auth, getAllUsers);
+router.get("/users", getAllUsers);
 router.get("/users/me", auth, getMyUser);
 router.get("/users/:id", getUserbyID);
 
